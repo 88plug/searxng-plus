@@ -22,7 +22,7 @@ about = {
     "require_api_key": False,
     "results": "JSON",
 }
-language_support = True
+language_support = False
 
 base_url = "https://api.yep.com"
 web_base_url = "https://yep.com"

@@ -77,6 +77,13 @@ class TestResolveBangDefinition(SearxTestCase):
         self.assertEqual(url, 'http://example.com/text')
         self.assertEqual(rank, 0)
 
+    def test_wayback_path_query_not_encoded(self):
+        bang = '//web.archive.org/web/*/' + chr(2) + chr(1) + '54'
+        query = 'https://example.com/page'
+        url, rank = resolve_bang_definition(bang, query)
+        self.assertEqual(url, 'https://web.archive.org/web/*/https://example.com/page')
+        self.assertEqual(rank, 54)
+
 
 class TestGetBangDefinitionAndAutocomplete(SearxTestCase):
 

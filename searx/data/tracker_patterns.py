@@ -146,14 +146,16 @@ class TrackerPatternsDB:
             query_args: list[tuple[str, str]] = list(parse_qsl(parsed_new_url.query))
             if query_args:
                 # remove tracker arguments from the url-query part
-                for name, val in query_args.copy():
-                    # remove URL arguments
+                for name, val in list(query_args):
+                    # remove URL arguments (one rule per arg; overlapping rules #6111)
                     for pattern in rule[self.Fields.del_args]:
                         if re.match(pattern, name):
                             log.debug(
                                 "TRACKER_PATTERNS: %s remove tracker arg: %s='%s'", parsed_new_url.netloc, name, val
                             )
-                            query_args.remove((name, val))
+                            if (name, val) in query_args:
+                                query_args.remove((name, val))
+                            break
 
                 parsed_new_url = parsed_new_url._replace(query=urlencode(query_args))
                 new_url = urlunparse(parsed_new_url)

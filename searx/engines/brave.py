@@ -317,7 +317,12 @@ def _parse_search(resp: SXNG_Response) -> EngineResults:
                 pub_date = _extract_published_date(_pub_date)
                 content = content.lstrip(_pub_date).strip("- \n\t")
 
-        thumbnail: str = eval_xpath_getindex(result, ".//a[contains(@class, 'thumbnail')]//img/@src", 0, default="")
+        img_node = eval_xpath_getindex(result, ".//a[contains(@class, 'thumbnail')]//img", 0, default=None)
+        thumbnail: str = ""
+        if img_node is not None:
+            thumbnail = img_node.get("data-src") or img_node.get("src", "")
+            if thumbnail.startswith("data:image/") or thumbnail.startswith("/"):
+                thumbnail = img_node.get("data-src", thumbnail)
 
         item = res.types.LegacyResult(
             template="default.html",

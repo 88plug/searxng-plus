@@ -56,11 +56,12 @@ def init(engine_settings: dict[str, t.Any]):
 def fetch_vqd(
     query: str,
     params: "OnlineParams",
+    iar: str = "images",
 ):
 
     logger.debug("fetch_vqd: request value from from duckduckgo.com")
     resp = get(
-        url=f"https://duckduckgo.com/?q={quote_plus(query)}&iar=images&t=h_",
+        url=f"https://duckduckgo.com/?q={quote_plus(query)}&iar={iar}&t=h_",
         headers=params["headers"],
         timeout=2,
     )
@@ -97,7 +98,8 @@ def request(query: str, params: "OnlineParams") -> None:
     # The vqd value is generated from the query and the UA header. To be able to
     # reuse the vqd value, the UA header must be static.
     headers["User-Agent"] = _HTTP_User_Agent
-    vqd = get_vqd(query=query, params=params) or fetch_vqd(query=query, params=params)
+    params["iar"] = ddg_category
+    vqd = get_vqd(query=query, params=params) or fetch_vqd(query=query, params=params, iar=ddg_category)
 
     headers["Accept"] = "*/*"
     headers["Referer"] = "https://duckduckgo.com/"

@@ -738,6 +738,7 @@ engines:
     shortcut: yep
     categories: general
     disabled: true
+    inactive: true
 
   - name: currency
     engine: currency_convert
@@ -839,6 +840,8 @@ engines:
     shortcut: wd
     timeout: 3.0
     weight: 2
+    disabled: true
+    inactive: true
     # add "list" to the array to get results in the results list
     display_type: ["infobox"]
     categories: [general]
@@ -2906,6 +2909,8 @@ engines:
     search_type: image
     shortcut: yai
     disabled: true
+    base_url:
+      - https://yacy.searchlab.eu
     # timeout can be reduced in 'local' search mode
     timeout: 5.0
 

@@ -51,7 +51,11 @@ def resolve_bang_definition(bang_definition: str, query: str) -> tuple[str, int]
     if url.startswith('//'):
         url = 'https:' + url
     if query:
-        url = url.replace(chr(2), quote_plus(query))
+        # Path-suffix bangs (e.g. web.archive.org/web/*/URL) must not encode the query.
+        if url.endswith(f"/{chr(2)}"):
+            url = url.replace(chr(2), query)
+        else:
+            url = url.replace(chr(2), quote_plus(query))
     else:
         # go to main instead of search page
         o = urlparse(url)
