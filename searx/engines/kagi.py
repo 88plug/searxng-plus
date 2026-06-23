@@ -149,7 +149,7 @@ def response(resp: "SXNG_Response") -> EngineResults:
                 res.types.MainResult(
                     url=result["url"],
                     title=html.unescape(result["title"]),
-                    content=html.unescape(result["snippet"]),
+                    content=html.unescape(result.get("snippet") or ""),
                     thumbnail=result.get("image", {}).get("url") or "",
                     publishedDate=published_date,
                 )
@@ -175,7 +175,7 @@ def response(resp: "SXNG_Response") -> EngineResults:
                         "template": "videos.html",
                         "url": result["url"],
                         "title": html.unescape(result["title"]),
-                        "content": html.unescape(result["snippet"]),
+                        "content": html.unescape(result.get("snippet") or ""),
                         "thumbnail": result.get("image", {}).get("url"),
                         "publishedDate": published_date,
                         "author": result["props"].get("creator_name"),

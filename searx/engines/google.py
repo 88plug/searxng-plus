@@ -425,7 +425,19 @@ def response(resp: "SXNG_Response"):
         # append suggestion
         results.append({"suggestion": extract_text(suggestion)})
 
-    # return results
+    if not results:
+        candidates = eval_xpath_list(dom, '//a[@data-ved and not(@class)]')
+        if candidates:
+            logger.warning(
+                "google: HTTP 200 but parsed 0 results (%d candidate nodes in response)",
+                len(candidates),
+            )
+        elif len(resp.text) > 1000:
+            logger.warning(
+                "google: HTTP 200 but no parseable results (response length %d)",
+                len(resp.text),
+            )
+
     return results
 
 

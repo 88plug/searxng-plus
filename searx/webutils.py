@@ -29,7 +29,7 @@ if TYPE_CHECKING:
     from searx.search import SearchQuery
     from searx.results import UnresponsiveEngine
 
-VALID_LANGUAGE_CODE = re.compile(r'^[a-z]{2,3}(-[a-zA-Z]{2})?$')
+VALID_LANGUAGE_CODE = re.compile(r'^[a-z]{2,3}(-[a-zA-Z]{2,8}){0,2}$')
 
 logger = logger.getChild('webutils')
 

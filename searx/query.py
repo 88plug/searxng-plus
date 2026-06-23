@@ -237,6 +237,16 @@ class BangParser(QueryPartParser):
                 self._add_autocomplete(first_char + engine_shortcut)
 
 
+class RequireAllTermsParser(QueryPartParser):
+    @staticmethod
+    def check(raw_value):
+        return raw_value == '!+'
+
+    def __call__(self, raw_value):
+        self.raw_text_query.require_all_terms = True
+        return True
+
+
 class FeelingLuckyParser(QueryPartParser):
     @staticmethod
     def check(raw_value):
@@ -254,6 +264,7 @@ class RawTextQuery:
         TimeoutParser,  # force the timeout
         LanguageParser,  # force a language
         ExternalBangParser,  # external bang (must be before BangParser)
+        RequireAllTermsParser,  # quote all search terms
         BangParser,  # force an engine or category
         FeelingLuckyParser,  # redirect to the first link in the results list
     ]
@@ -275,6 +286,7 @@ class RawTextQuery:
         self.user_query_parts = []  # use self.getQuery()
         self.autocomplete_location = None
         self.redirect_to_first_result = False
+        self.require_all_terms = False
         self._parse_query()
 
     def _parse_query(self):
@@ -321,6 +333,8 @@ class RawTextQuery:
         return self
 
     def getQuery(self):
+        if self.require_all_terms and self.user_query_parts:
+            return ' '.join(f'"{part}"' for part in self.user_query_parts)
         return ' '.join(self.user_query_parts)
 
     def getFullQuery(self):

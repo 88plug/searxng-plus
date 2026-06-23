@@ -10,6 +10,8 @@ import logging
 from base64 import b64decode
 from os.path import dirname, abspath
 
+import re
+
 import msgspec
 
 from typing_extensions import override
@@ -113,6 +115,24 @@ class SettingSublistValue(SettingsValue):
                 raise ValueError('{} not in {}'.format(item, self.type_definition))
 
 
+_BCP47_LANGUAGE_CODE = re.compile(r'^[a-z]{2,3}(-[a-zA-Z]{2,8}){0,2}$')
+
+
+class SettingLanguageListValue(SettingSublistValue):
+    """Allow locales from sxng_locales plus valid BCP47 codes in settings."""
+
+    @override
+    def check_type_definition(self, value: list[t.Any]) -> None:
+        if not isinstance(value, list):
+            raise ValueError('The value has to a list')
+
+        allowed = self.type_definition[0]
+        for item in value:
+            if item in allowed or item == 'all' or _BCP47_LANGUAGE_CODE.match(item):
+                continue
+            raise ValueError('{} not in {}'.format(item, allowed))
+
+
 class SettingsDirectoryValue(SettingsValue):
     """Check and update a setting value that is a directory path"""
 
@@ -196,7 +216,7 @@ SCHEMA: dict[str, t.Any] = {
         'autocomplete_min': SettingsValue(int, 4),
         'favicon_resolver': SettingsValue(str, ''),
         'default_lang': SettingsValue(tuple(SXNG_LOCALE_TAGS + ['']), ''),
-        'languages': SettingSublistValue(SXNG_LOCALE_TAGS, SXNG_LOCALE_TAGS),  # type: ignore
+        'languages': SettingLanguageListValue(SXNG_LOCALE_TAGS, SXNG_LOCALE_TAGS),  # type: ignore
         'ban_time_on_fail': SettingsValue(numbers.Real, 5),
         'max_ban_time_on_fail': SettingsValue(numbers.Real, 120),
         'suspended_times': {
@@ -214,6 +234,7 @@ SCHEMA: dict[str, t.Any] = {
         'port': SettingsValue((int, str), 8888, 'SEARXNG_PORT'),
         'bind_address': SettingsValue(str, '127.0.0.1', 'SEARXNG_BIND_ADDRESS'),
         'limiter': SettingsValue(bool, False, 'SEARXNG_LIMITER'),
+        'limiter_bypass_key': SettingsValue((None, False, str), False, 'SEARXNG_LIMITER_BYPASS_KEY'),
         'public_instance': SettingsValue(bool, False, 'SEARXNG_PUBLIC_INSTANCE'),
         'secret_key': SettingsValue(str, environ_name='SEARXNG_SECRET'),
         'base_url': SettingsValue((False, str), False, 'SEARXNG_BASE_URL'),

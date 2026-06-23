@@ -7,6 +7,7 @@ import typing as t
 __all__ = ["TrackerPatternsDB"]
 
 import re
+import threading
 from collections.abc import Iterator
 from urllib.parse import urlparse, urlunparse, parse_qsl, urlencode
 
@@ -20,6 +21,18 @@ if t.TYPE_CHECKING:
 
 
 RuleType = tuple[str, list[str], list[str]]
+
+_INIT_LOCK = threading.Lock()
+
+
+def _clearurl_fetch_timeout() -> float:
+    from searx import settings  # pylint: disable=import-outside-toplevel
+
+    plugin_cfg = settings.get('plugins', {}).get('searx.plugins.tracker_url_remover.SXNGPlugin', {})
+    timeout = plugin_cfg.get('clearurl_fetch_timeout')
+    if isinstance(timeout, (int, float)) and timeout > 0:
+        return float(timeout)
+    return 3.0
 
 
 @t.final
@@ -45,10 +58,11 @@ class TrackerPatternsDB:
         self.cache = get_cache()
 
     def init(self):
-        if self.cache.properties("tracker_patterns loaded") != "OK":
-            # To avoid parallel initializations, the property is set first
-            self.cache.properties.set("tracker_patterns loaded", "OK")
-            self.load()
+        with _INIT_LOCK:
+            if self.cache.properties("tracker_patterns loaded") != "OK":
+                # To avoid parallel initializations, the property is set first
+                self.cache.properties.set("tracker_patterns loaded", "OK")
+                self.load()
         # F I X M E:
         #     do we need a maintenance .. remember: database is stored
         #     in /tmp and will be rebuild during the reboot anyway
@@ -85,7 +99,7 @@ class TrackerPatternsDB:
         for url in self.CLEAR_LIST_URL:
             log.debug("TRACKER_PATTERNS: Trying to fetch %s...", url)
             try:
-                resp = http_get(url, timeout=3)
+                resp = http_get(url, timeout=_clearurl_fetch_timeout())
 
             except HTTPError as exc:
                 log.warning("TRACKER_PATTERNS: HTTPError (%s) occured while fetching %s", url, exc)

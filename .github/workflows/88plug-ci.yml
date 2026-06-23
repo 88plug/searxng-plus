@@ -1,0 +1,149 @@
+---
+name: 88plug CI
+
+# yamllint disable-line rule:truthy
+on:
+  push:
+    branches:
+      - searxng-plus
+  pull_request:
+    branches:
+      - searxng-plus
+  workflow_dispatch:
+
+concurrency:
+  group: 88plug-ci-${{ github.ref_name }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  CONTAINER_IMAGE: ghcr.io/88plug/searxng-plus
+  CONTAINER_IMAGE_ORGANIZATION: 88plug
+  CONTAINER_IMAGE_NAME: searxng-plus
+  PYTHON_VERSION: "3.12"
+
+jobs:
+  test:
+    name: Unit tests
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
+        with:
+          persist-credentials: "false"
+
+      - name: Setup Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v6.2.0
+        with:
+          python-version: "${{ env.PYTHON_VERSION }}"
+
+      - name: Setup cache Python
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae  # v5.0.5
+        with:
+          key: "python-${{ env.PYTHON_VERSION }}-${{ runner.arch }}-${{ hashFiles('./requirements*.txt') }}"
+          restore-keys: |
+            python-${{ env.PYTHON_VERSION }}-${{ runner.arch }}-
+          path: "./local/"
+
+      - name: Install dependencies
+        run: make V=1 install
+
+      - name: Run CI tests
+        run: make V=1 ci.test
+
+  container:
+    name: Build and push container
+    runs-on: ubuntu-24.04
+    needs: test
+    if: github.event_name != 'pull_request'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
+        with:
+          persist-credentials: "false"
+          fetch-depth: "0"
+
+      - name: Setup Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v6.2.0
+        with:
+          python-version: "${{ env.PYTHON_VERSION }}"
+
+      - name: Setup cache Python
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae  # v5.0.5
+        with:
+          key: "python-${{ env.PYTHON_VERSION }}-${{ runner.arch }}-${{ hashFiles('./requirements*.txt') }}"
+          restore-keys: |
+            python-${{ env.PYTHON_VERSION }}-${{ runner.arch }}-
+          path: "./local/"
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@06116385d9baf250c9f4dcb4858b16962ea869c3  # v4.1.0
+
+      - name: Login to GHCR
+        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee  # v4.2.0
+        with:
+          registry: ghcr.io
+          username: "${{ github.repository_owner }}"
+          password: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Install dependencies
+        run: make V=1 install
+
+      - name: Freeze version metadata
+        run: python -m searx.version freeze
+
+      - name: Build and push
+        env:
+          GITHUB_ACTIONS: "true"
+          GITHUB_REPOSITORY: "88plug/searxng-plus"
+          GITHUB_REPOSITORY_OWNER: "88plug"
+        run: |
+          set -euo pipefail
+          eval "$(python -m searx.version)"
+          SHORT_SHA="${GITHUB_SHA::7}"
+
+          docker buildx build --platform linux/amd64 --load \
+            --build-arg="TIMESTAMP_VENV=0" \
+            --tag="localhost/88plug/searxng-plus:builder" \
+            --file="./container/builder.dockerfile" \
+            .
+
+          docker buildx build --platform linux/amd64 --load \
+            --build-arg="CONTAINER_IMAGE_ORGANIZATION=88plug" \
+            --build-arg="CONTAINER_IMAGE_NAME=searxng-plus" \
+            --build-arg="CREATED=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --build-arg="VERSION=$DOCKER_TAG" \
+            --build-arg="VCS_URL=$GIT_URL" \
+            --build-arg="VCS_REVISION=$GITHUB_SHA" \
+            --tag="${{ env.CONTAINER_IMAGE }}:${SHORT_SHA}" \
+            --tag="${{ env.CONTAINER_IMAGE }}:latest" \
+            --file="./container/dist.dockerfile" \
+            .
+
+          docker push "${{ env.CONTAINER_IMAGE }}:${SHORT_SHA}"
+          docker push "${{ env.CONTAINER_IMAGE }}:latest"
+
+      - name: Smoke test
+        run: |
+          set -euo pipefail
+          SHORT_SHA="${GITHUB_SHA::7}"
+          docker run -d --name searxng-plus-ci --network host \
+            "${{ env.CONTAINER_IMAGE }}:${SHORT_SHA}"
+          sleep 8
+          curl -vf --max-time 10 http://localhost:8080/healthz
+          docker rm -f searxng-plus-ci
+
+      - name: Set package visibility to public
+        env:
+          GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        run: |
+          gh api \
+            --method PATCH \
+            -H "Accept: application/vnd.github+json" \
+            "/orgs/88plug/packages/container/searxng-plus" \
+            -f visibility=public \
+            2>/dev/null || true

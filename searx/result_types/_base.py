@@ -235,7 +235,7 @@ def _normalize_date_fields(result: "MainResult | LegacyResult"):
 
     if result.publishedDate:  # do not try to get a date from an empty string or a None type
         try:  # test if publishedDate >= 1900 (datetime module bug)
-            result.pubdate = result.publishedDate.strftime('%Y-%m-%d %H:%M:%S%z')
+            result.pubdate = result.publishedDate.strftime('%Y-%m-%d %H:%M')
         except ValueError:
             result.publishedDate = None
 

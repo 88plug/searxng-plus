@@ -225,7 +225,12 @@ class PluginStorage:
             if cls is None:
                 msg = f"plugin {fqn} is not implemented"
                 raise ValueError(msg)
-            plg = cls(PluginCfg(**plg_settings))
+            plg_cfg_kwargs = dict(plg_settings)
+            active = plg_cfg_kwargs.pop('active', False)
+            plg_cfg = PluginCfg(active=active)
+            for key, val in plg_cfg_kwargs.items():
+                setattr(plg_cfg, key, val)
+            plg = cls(plg_cfg)
             self.register(plg)
 
     def register(self, plugin: Plugin):

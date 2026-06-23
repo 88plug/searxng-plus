@@ -176,13 +176,13 @@ def response(resp: "SXNG_Response") -> EngineResults:
 
         title = extract_text(eval_xpath(result, "./h4")) or ""
 
-        # The pub_date is mostly a string like 'yesterday', not a real timezone
-        # date or time.  Therefore we can't use publishedDate and place the
-        # *pub* sting into the content.
-
         pub_date = extract_text(eval_xpath(result, ".//time"))
         pub_origin = extract_text(eval_xpath(result, ".//div[contains(@class, 'vr1PYe')]"))
-        content = " / ".join([x for x in [pub_origin, pub_date] if x])
+        metadata = " / ".join([x for x in [pub_origin, pub_date] if x])
+
+        content = extract_text(eval_xpath(result, ".//div[contains(@class, 'GI74Re')]"))
+        if not content:
+            content = extract_text(eval_xpath(result, ".//div[contains(@class, 'Y3v8qd')]"))
 
         thumbnail: str = eval_xpath_getindex(result, ".//figure/img/@src", 0, default="")
         if thumbnail and thumbnail.startswith("/"):
@@ -193,6 +193,7 @@ def response(resp: "SXNG_Response") -> EngineResults:
                 url=url,
                 title=title,
                 content=content,
+                metadata=metadata,
                 thumbnail=thumbnail,
             )
         )

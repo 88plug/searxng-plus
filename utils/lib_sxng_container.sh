@@ -9,7 +9,11 @@ EOF
 }
 
 CONTAINER_IMAGE_ORGANIZATION=${GITHUB_REPOSITORY_OWNER:-"searxng"}
-CONTAINER_IMAGE_NAME="searxng"
+if [[ "${GITHUB_REPOSITORY:-}" == *"searxng-plus"* ]] || [[ "$(basename "$(git rev-parse --show-toplevel 2>/dev/null || pwd)")" == "searxng-plus" ]]; then
+    CONTAINER_IMAGE_NAME="searxng-plus"
+else
+    CONTAINER_IMAGE_NAME="searxng"
+fi
 
 container.build() {
     local parch=${OVERRIDE_ARCH:-$(uname -m)}

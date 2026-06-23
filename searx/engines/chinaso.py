@@ -62,6 +62,7 @@ from urllib.parse import urlencode
 from datetime import datetime
 
 from searx.exceptions import SearxEngineAPIException
+from searx.network import HEAD
 from searx.utils import html_to_text
 
 about = {
@@ -106,6 +107,20 @@ chinaso_news_source: ChinasoNewsSourceType = 'all'
 time_range_dict = {'day': '24h', 'week': '1w', 'month': '1m', 'year': '1y'}
 
 base_url = "https://www.chinaso.com"
+
+_link_prefix = f"{base_url}/link?url="
+
+
+def _resolve_url(url: str) -> str:
+    if not url.startswith(_link_prefix):
+        return url
+    try:
+        resp = HEAD(url, timeout=2.0, allow_redirects=True)
+        if resp.url and not str(resp.url).startswith(base_url):
+            return str(resp.url)
+    except Exception:  # pylint: disable=broad-except
+        pass
+    return url
 
 
 def init(_):
@@ -184,7 +199,7 @@ def parse_news(data):
         results.append(
             {
                 'title': html_to_text(entry["title"]),
-                'url': entry["url"],
+                'url': _resolve_url(entry["url"]),
                 'content': html_to_text(entry["snippet"]),
                 'publishedDate': published_date,
             }
@@ -200,7 +215,7 @@ def parse_images(data):
     for entry in data["data"]["arrRes"]:
         results.append(
             {
-                'url': entry["web_url"],
+                'url': _resolve_url(entry["web_url"]),
                 'title': html_to_text(entry["title"]),
                 'content': html_to_text(entry.get("ImageInfo", "")),
                 'template': 'images.html',
@@ -226,7 +241,7 @@ def parse_videos(data):
 
         results.append(
             {
-                'url': entry["url"],
+                'url': _resolve_url(entry["url"]),
                 'title': html_to_text(entry["raw_title"]),
                 'template': 'videos.html',
                 'publishedDate': published_date,

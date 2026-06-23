@@ -54,6 +54,7 @@ Implementations
 
 
 import random
+import json
 from json import loads
 from urllib.parse import urlencode
 from dateutil import parser
@@ -149,7 +150,18 @@ def request(query, params):
 def response(resp):
     results = []
 
-    raw_search_results = loads(resp.text)
+    text = resp.text.strip()
+    try:
+        raw_search_results = loads(text)
+    except json.JSONDecodeError:
+        start = text.find('{')
+        end = text.rfind('}')
+        if start < 0 or end <= start:
+            return []
+        try:
+            raw_search_results = loads(text[start : end + 1])
+        except json.JSONDecodeError:
+            return []
 
     # return empty array if there are no results
     if not raw_search_results:
