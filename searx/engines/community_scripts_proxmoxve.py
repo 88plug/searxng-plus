@@ -29,7 +29,6 @@ if t.TYPE_CHECKING:
 
 engine_type = "offline"
 categories = ["it"]
-disabled = True
 paging = False
 time_range_support = False
 

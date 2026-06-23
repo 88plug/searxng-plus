@@ -409,7 +409,6 @@ engines:
     engine: ard_sounds
     shortcut: ard
     categories: [music]
-    disabled: true
 
   # - name: annas articles
   #   engine: annas_archive
@@ -511,7 +510,6 @@ engines:
     engine: base
     shortcut: bs
     categories: [science]
-    disabled: true
 
   - name: bandcamp
     engine: bandcamp
@@ -528,7 +526,6 @@ engines:
     url_xpath: .//a/@href
     title_xpath: .//a
     content_xpath: .//p
-    disabled: true
     about:
       website: https://cartes.app/
       wikidata_id: null
@@ -1382,7 +1379,6 @@ engines:
     url_prefix: https://scholar.archive.org
     title_xpath: .//div[@class='result-title']/a
     content_xpath: .//div[@class='result-highlights']
-    disabled: true
     about:
       website: https://scholar.archive.org/
       use_official_api: false
@@ -1764,7 +1760,6 @@ engines:
     url_xpath: .//a[contains(@class, 'result-url')]/@href | .//div[@class='result-title']/a/@href
     title_xpath: .//div[@class='result-title']/a | .//a[contains(@class, 'result-title')]
     content_xpath: .//div[@class='result-snippet']
-    disabled: true
     about:
       website: https://neocities.org/
       use_official_api: false
@@ -2092,7 +2087,6 @@ engines:
     engine: community_scripts_proxmoxve
     shortcut: pve
     categories: [it]
-    disabled: true
 
   - name: pubmed
     engine: pubmed
