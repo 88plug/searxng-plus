@@ -81,14 +81,15 @@ def _obtain_telemetry_data(query: str) -> dict[str, str]:
         headers={"User-Agent": gen_useragent(), "Sec-GPC": "1", "Referer": f"{base_url}/"},
         raise_for_httperror=False,
     )
-    if resp.status_code in (401, 403) or not extr(resp.text, "authorization"):
-        raise SearxEngineAccessDeniedException()
 
     def extr_js_variable(name: str) -> str:
         val = extr(resp.text, f"var {name} = \"", "\";")
         if not val:
             val = extr(resp.text, f"var {name} = '", "';")
         return val
+
+    if resp.status_code in (401, 403) or not extr_js_variable("authorization"):
+        raise SearxEngineAccessDeniedException()
 
     return {
         "ip": extr_js_variable("ip"),
