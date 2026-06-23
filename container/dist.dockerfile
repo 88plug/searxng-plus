@@ -8,6 +8,7 @@ COPY --chown=977:977 --from=builder /usr/local/searxng/.venv/ ./.venv/
 COPY --chown=977:977 --from=builder /usr/local/searxng/searx/ ./searx/
 COPY --chown=977:977 ./container/ ./
 COPY --chown=977:977 ./searx/version_frozen.py ./searx/
+COPY --chown=977:977 ./searx/favicons/favicons.toml ./favicons.toml.template
 
 ARG CREATED="0001-01-01T00:00:00Z"
 ARG VERSION="unknown"

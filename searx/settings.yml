@@ -2924,7 +2924,7 @@ engines:
 
   - name: neosearch
     engine: neosearch
-    shortcut: neo
+    shortcut: neos
 
   - name: rubygems
     shortcut: rbg

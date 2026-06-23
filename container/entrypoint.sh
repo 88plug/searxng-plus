@@ -94,6 +94,12 @@ EOF
     fi
 
     check_file "$target_settings"
+
+    local template_favicons="/usr/local/searxng/favicons.toml.template"
+    local target_favicons="$__SEARXNG_CONFIG_PATH/favicons.toml"
+    if [ ! -f "$target_favicons" ] && [ -f "$template_favicons" ]; then
+        cp -pfT "$template_favicons" "$target_favicons"
+    fi
 }
 
 cat <<EOF
