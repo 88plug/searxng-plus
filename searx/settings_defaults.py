@@ -115,7 +115,7 @@ class SettingSublistValue(SettingsValue):
                 raise ValueError('{} not in {}'.format(item, self.type_definition))
 
 
-_BCP47_LANGUAGE_CODE = re.compile(r'^[a-z]{2,3}(-[a-zA-Z]{2,8}){0,2}$')
+_BCP47_LANGUAGE_CODE = re.compile(r'^[a-z]{2,3}(-[a-zA-Z]{4})?(-[a-zA-Z]{2}|[0-9]{3})?$')
 
 
 class SettingLanguageListValue(SettingSublistValue):
