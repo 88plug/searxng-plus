@@ -2,7 +2,7 @@ general:
   # Debug mode, only for development. Is overwritten by ${SEARXNG_DEBUG}
   debug: false
   # displayed name
-  instance_name: "SearXNG"
+  instance_name: "SearXNG-Plus"
   # For example: https://example.com/privacy
   privacypolicy_url: false
   # use true to use your own donation page written in searx/info/en/donate.md
@@ -18,10 +18,10 @@ general:
   open_metrics: ''
 
 brand:
-  docs_url: https://docs.searxng.org/
+  docs_url: https://github.com/88plug/searxng-plus/blob/searxng-plus/docs/PLUS.md
   public_instances: https://searx.space
-  wiki_url: https://github.com/searxng/searxng/wiki
-  issue_url: https://github.com/searxng/searxng/issues
+  wiki_url: https://github.com/88plug/searxng-plus
+  issue_url: https://github.com/88plug/searxng-plus/issues
   display_instance_name: true
   # custom:
   #   # Custom entries in the footer: [title]: [link]
@@ -44,12 +44,12 @@ search:
   # Existing autocomplete backends: "360search", "baidu", "bing", "brave", "dbpedia", "duckduckgo", "google",
   # "yandex", "privacywall", "mwmbl", "naver", "seznam", "sogou", "startpage", "swisscows", "quark", "qwant",
   # "wikipedia" - leave blank to turn it off by default.
-  autocomplete: ""
+  autocomplete: "duckduckgo"
   # minimun characters to type before autocompleter starts
   autocomplete_min: 4
   # backend for the favicon near URL in search results.
   # Available resolvers: "allesedv", "duckduckgo", "google", "yandex" - leave blank to turn it off by default.
-  favicon_resolver: ""
+  favicon_resolver: "duckduckgo"
   # Default search language - leave blank to detect from browser information or
   # use codes from 'languages.py'
   default_lang: "auto"
@@ -2868,7 +2868,6 @@ engines:
       impersonate: chrome
     engine: mojeek
     categories: [general, web]
-    disabled: true
 
   - name: mojeek images
     shortcut: mjkimg
@@ -2877,7 +2876,6 @@ engines:
     categories: [images, web]
     search_type: images
     paging: false
-    disabled: true
 
   - name: mojeek news
     shortcut: mjknews
@@ -2886,7 +2884,6 @@ engines:
     categories: [news, web]
     search_type: news
     paging: false
-    disabled: true
 
   - name: moviepilot
     engine: moviepilot

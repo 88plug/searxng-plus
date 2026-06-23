@@ -1,16 +1,31 @@
 # SearXNG-Plus first-run settings template.
 # Full documentation: https://github.com/88plug/searxng-plus/blob/searxng-plus/docs/PLUS.md
-# Upstream settings reference: https://docs.searxng.org/admin/settings/
 
 use_default_settings: true
+
+general:
+  instance_name: "SearXNG-Plus"
 
 server:
   secret_key: "ultrasecretkey"
   image_proxy: true
+  limiter: false
 
-# Plus-added engines: enabled on first run (defaults-enabled policy).
-# Merged into default settings from searx/settings.yml.
+search:
+  autocomplete: duckduckgo
+  favicon_resolver: duckduckgo
+
+brand:
+  display_instance_name: true
+
+# Plus-added and plus-tuned engines: enabled on first run.
 engines:
+  - name: mojeek
+    disabled: false
+  - name: mojeek images
+    disabled: false
+  - name: mojeek news
+    disabled: false
   - name: neocities
     disabled: false
   - name: cartes
@@ -41,6 +56,23 @@ engines:
     disabled: false
   - name: chatnoir
     disabled: false
-
-brand:
-  display_instance_name: true
+  - name: heexy
+    disabled: false
+  - name: heexy images
+    disabled: false
+  - name: seekninja
+    disabled: false
+  - name: findfiles
+    disabled: false
+  - name: luxxle
+    disabled: false
+  - name: searchzee
+    disabled: false
+  - name: podchaser
+    disabled: false
+  - name: vuhuv
+    disabled: false
+  - name: s1search
+    disabled: false
+  - name: resulthunter
+    disabled: false

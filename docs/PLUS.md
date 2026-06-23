@@ -239,6 +239,25 @@ Onion-category engines (Ahmia, etc.) require Tor; the `ahmia_filter` plugin enfo
 
 ---
 
+## Just-works defaults (round 5)
+
+SearXNG-Plus ships tuned for self-hosters who want results without tuning YAML:
+
+| Setting | Value | Why |
+|---------|-------|-----|
+| `general.instance_name` | `SearXNG-Plus` | Clear branding |
+| `search.autocomplete` | `duckduckgo` | Works without API keys |
+| `search.favicon_resolver` | `duckduckgo` | Favicons in results out of the box |
+| `server.limiter` | `false` | No spurious `limiter.toml` noise on private instances |
+| `server.image_proxy` | `true` | Thumbnails work through the instance |
+| Mojeek engines | **enabled** | `curl_cffi` chrome impersonate (live-eval verified) |
+| Valkey sidecar | **on** in compose | `SEARXNG_VALKEY_URL` wired automatically |
+| Tor / global impersonate | **off** | Opt-in only — eval showed DDG breaks with global impersonate |
+
+Docker Compose brings up core + Valkey. First run copies `settings.template.yml` with all plus engines enabled.
+
+---
+
 ## Defaults enabled policy
 
 SearXNG-Plus follows a simple rule:
