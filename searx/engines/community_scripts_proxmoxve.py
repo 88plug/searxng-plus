@@ -127,7 +127,7 @@ def _fetch_scripts() -> list[dict[str, t.Any]]:
 
 
 def setup(engine_settings: dict[str, t.Any]) -> bool:
-    global CACHE, _HMAC_SECRET_KEY
+    global CACHE, _HMAC_SECRET_KEY  # pylint: disable=global-statement
     CACHE = EngineCache(engine_settings["name"])
 
     key = engine_settings.get("hmac_secret_key")

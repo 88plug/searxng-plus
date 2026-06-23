@@ -62,7 +62,7 @@ from urllib.parse import urlencode
 from datetime import datetime
 
 from searx.exceptions import SearxEngineAPIException
-from searx.network import HEAD
+from searx.network import head
 from searx.utils import html_to_text
 
 about = {
@@ -115,7 +115,7 @@ def _resolve_url(url: str) -> str:
     if not url.startswith(_link_prefix):
         return url
     try:
-        resp = HEAD(url, timeout=2.0, allow_redirects=True)
+        resp = head(url, timeout=2.0, allow_redirects=True)
         if resp.url and not str(resp.url).startswith(base_url):
             return str(resp.url)
     except Exception:  # pylint: disable=broad-except
