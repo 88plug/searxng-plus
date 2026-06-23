@@ -174,15 +174,27 @@ def response(resp: "SXNG_Response") -> EngineResults:
             logger.error(f"no real-url found: {url}")
             continue
 
-        title = extract_text(eval_xpath(result, "./h4")) or ""
+        # title is in <h4> or (since Google changed DOM) in the <a target='_blank'> link text
+        title = (
+            extract_text(eval_xpath(result, "./h4")) or extract_text(eval_xpath(result, ".//a[@target='_blank']")) or ""
+        )
+
+        # The pub_date is mostly a relative string like '3 hours ago', not a
+        # real timezone date/time, so we can't use publishedDate.
+        # pub_origin and pub_date go into metadata.
 
         pub_date = extract_text(eval_xpath(result, ".//time"))
-        pub_origin = extract_text(eval_xpath(result, ".//div[contains(@class, 'vr1PYe')]"))
+        pub_origin = extract_text(eval_xpath(result, ".//a[contains(@class, 'wEwyrc')]"))
         metadata = " / ".join([x for x in [pub_origin, pub_date] if x])
 
+        # Google News HTML does not provide article snippets.
+        # Use the author name (uQIVzc) as content if present.
+        author = extract_text(eval_xpath(result, ".//div[contains(@class, 'uQIVzc')]")) or ""
         content = extract_text(eval_xpath(result, ".//div[contains(@class, 'GI74Re')]"))
         if not content:
             content = extract_text(eval_xpath(result, ".//div[contains(@class, 'Y3v8qd')]"))
+        if not content:
+            content = author
 
         thumbnail: str = eval_xpath_getindex(result, ".//figure/img/@src", 0, default="")
         if thumbnail and thumbnail.startswith("/"):
@@ -193,6 +205,7 @@ def response(resp: "SXNG_Response") -> EngineResults:
                 url=url,
                 title=title,
                 content=content,
+                author=author,
                 metadata=metadata,
                 thumbnail=thumbnail,
             )

@@ -86,7 +86,11 @@
 
 @import "style.less";
 
-#q,
+#q {
+  // Keep bang prefixes at the start of the query (issue #2699)
+  unicode-bidi: plaintext;
+}
+
 #sidebar .infobox dt bdi {
   direction: rtl;
 }
@@ -102,6 +106,13 @@
 
   .result .url_wrapper {
     justify-content: end;
+
+    // Hide host/path separator when there is no path (issue #3724)
+    .url_o1:only-child::after,
+    .url_o1:last-child::after {
+      content: none;
+      width: 0;
+    }
   }
 }
 

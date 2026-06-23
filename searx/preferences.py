@@ -27,6 +27,15 @@ from searx.webutils import VALID_LANGUAGE_CODE
 from ._settings import SettingsPref
 
 COOKIE_MAX_AGE = 60 * 60 * 24 * 365 * 5  # 5 years
+COOKIE_PATH = '/'
+COOKIE_SAMESITE = 'Lax'
+
+
+def set_preference_cookie(resp: flask.Response, name: str, value: str) -> None:
+    """Set a preference cookie with path and SameSite attributes."""
+    resp.set_cookie(name, value, max_age=COOKIE_MAX_AGE, path=COOKIE_PATH, samesite=COOKIE_SAMESITE)
+
+
 DOI_RESOLVERS = list(settings['doi_resolvers'])
 
 MAP_STR2BOOL: dict[str, bool] = OrderedDict(
@@ -72,7 +81,7 @@ class Setting:
         """Save cookie ``name`` in the HTTP response object
 
         If needed, its overwritten in the inheritance."""
-        resp.set_cookie(name, self.value, max_age=COOKIE_MAX_AGE)
+        set_preference_cookie(resp, name, self.value)
 
 
 class StringSetting(Setting):
@@ -133,7 +142,7 @@ class MultipleChoiceSetting(Setting):
 
     def save(self, name: str, resp: flask.Response):
         """Save cookie ``name`` in the HTTP response object"""
-        resp.set_cookie(name, ','.join(self.value), max_age=COOKIE_MAX_AGE)
+        set_preference_cookie(resp, name, ','.join(self.value))
 
 
 class SetSetting(Setting):
@@ -166,7 +175,7 @@ class SetSetting(Setting):
 
     def save(self, name: str, resp: flask.Response):
         """Save cookie ``name`` in the HTTP response object"""
-        resp.set_cookie(name, ','.join(self.values), max_age=COOKIE_MAX_AGE)
+        set_preference_cookie(resp, name, ','.join(self.values))
 
 
 class SearchLanguageSetting(EnumStringSetting):
@@ -221,7 +230,7 @@ class MapSetting(Setting):
     def save(self, name: str, resp: flask.Response):
         """Save cookie ``name`` in the HTTP response object"""
         if hasattr(self, 'key'):
-            resp.set_cookie(name, self.key, max_age=COOKIE_MAX_AGE)
+            set_preference_cookie(resp, name, self.key)
 
 
 class BooleanSetting(Setting):
@@ -244,7 +253,7 @@ class BooleanSetting(Setting):
     def save(self, name: str, resp: flask.Response):
         """Save cookie ``name`` in the HTTP response object"""
         if hasattr(self, 'key'):
-            resp.set_cookie(name, self.key, max_age=COOKIE_MAX_AGE)
+            set_preference_cookie(resp, name, self.key)
 
 
 class BooleanChoices:
@@ -291,8 +300,8 @@ class BooleanChoices:
         """Save cookie in the HTTP response object"""
         disabled_changed = (k for k in self.disabled if self.default_choices[k])
         enabled_changed = (k for k in self.enabled if not self.default_choices[k])
-        resp.set_cookie('disabled_{0}'.format(self.name), ','.join(disabled_changed), max_age=COOKIE_MAX_AGE)
-        resp.set_cookie('enabled_{0}'.format(self.name), ','.join(enabled_changed), max_age=COOKIE_MAX_AGE)
+        set_preference_cookie(resp, 'disabled_{0}'.format(self.name), ','.join(disabled_changed))
+        set_preference_cookie(resp, 'enabled_{0}'.format(self.name), ','.join(enabled_changed))
 
     def get_disabled(self):
         return self.transform_values(list(self.disabled))

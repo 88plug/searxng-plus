@@ -1,8 +1,46 @@
-# Read the documentation before extending the defaults:
-# https://docs.searxng.org/admin/settings/
+# SearXNG-Plus first-run settings template.
+# Full documentation: https://github.com/88plug/searxng-plus/blob/searxng-plus/docs/PLUS.md
+# Upstream settings reference: https://docs.searxng.org/admin/settings/
 
 use_default_settings: true
 
 server:
   secret_key: "ultrasecretkey"
   image_proxy: true
+
+# Plus-added engines: enabled on first run (defaults-enabled policy).
+# Merged into default settings from searx/settings.yml.
+engines:
+  - name: neocities
+    disabled: false
+  - name: cartes
+    disabled: false
+  - name: internet archive scholar
+    disabled: false
+  - name: ard sounds
+    disabled: false
+  - name: base
+    disabled: false
+  - name: proxmox ve community scripts
+    disabled: false
+  - name: icons8
+    disabled: false
+  - name: neosearch
+    disabled: false
+  - name: picjumbo
+    disabled: false
+  - name: magnific
+    disabled: false
+  - name: stocksnap
+    disabled: false
+  - name: shopify stock
+    disabled: false
+  - name: sina
+    disabled: false
+  - name: giphy
+    disabled: false
+  - name: chatnoir
+    disabled: false
+
+brand:
+  display_instance_name: true

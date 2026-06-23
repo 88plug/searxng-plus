@@ -31,6 +31,11 @@ on the /search URL and when the "center alignment" preference is enabled.
 @media screen and (min-width: @phone) and (max-width: @tablet) {
   // any change must be reset in @media screen and (min-width: @tablet) { ... }
   .center-alignment-yes #main_results {
+    #answers {
+      width: 60%;
+      align-self: flex-start;
+    }
+
     #results {
       grid-template-columns: 60% calc(40% - @results-gap);
       margin-left: 0;
@@ -78,6 +83,11 @@ on the /search URL and when the "center alignment" preference is enabled.
     .search_filters {
       .ltr-margin-left(0.5rem);
       width: var(--center-page-width);
+    }
+
+    #answers {
+      width: calc(var(--center-page-width) - @results-gap - @results-sidebar-width);
+      align-self: flex-start;
     }
 
     #results {

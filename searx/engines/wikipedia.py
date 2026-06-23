@@ -140,7 +140,13 @@ def get_wiki_params(sxng_locale, eng_traits):
     (region) higher than a language (compare :py:obj:`wiki_lc_locale_variants`).
 
     """
-    eng_tag = eng_traits.get_region(sxng_locale, eng_traits.get_language(sxng_locale, "en"))
+    # Use explicit region mappings for language variants (e.g. zh-CN, zh-SG).
+    # For locales like en-SG, prefer the selected language over territory
+    # fallback (which would map SG to zh via official languages).
+    if sxng_locale in eng_traits.regions:
+        eng_tag = eng_traits.regions[sxng_locale]
+    else:
+        eng_tag = eng_traits.get_language(sxng_locale, "en")
     wiki_netloc = eng_traits.custom["wiki_netloc"].get(eng_tag, "en.wikipedia.org")
     return eng_tag, wiki_netloc
 

@@ -291,12 +291,17 @@ def startpage(query: str, sxng_locale: str) -> list[str]:
     url = f'https://www.startpage.com/suggestions?{urlencode(url_params)}'
 
     # Needs user agent, returns a 204 otherwise
-    h = {'User-Agent': gen_useragent()}
+    h = {
+        'User-Agent': gen_useragent(),
+        'Accept': 'application/json',
+        'Referer': 'https://www.startpage.com/',
+        'Accept-Language': sxng_locale,
+    }
 
     resp = get(url, headers=h)
     results: list[str] = []
 
-    if resp.ok:
+    if resp.ok and resp.text:
         try:
             data = resp.json()
             if len(data) >= 2 and isinstance(data[1], list):
@@ -390,11 +395,25 @@ backends: dict[str, t.Callable[[str, str], list[str]]] = {
 }
 
 
+def _filter_suggestions(suggestions: list[str]) -> list[str]:
+    """Remove empty and duplicate autocomplete suggestions."""
+    filtered: list[str] = []
+    seen: set[str] = set()
+    for suggestion in suggestions:
+        if not suggestion or not suggestion.strip():
+            continue
+        if suggestion in seen:
+            continue
+        seen.add(suggestion)
+        filtered.append(suggestion)
+    return filtered
+
+
 def search_autocomplete(backend_name: str, query: str, sxng_locale: str) -> list[str]:
     backend = backends.get(backend_name)
     if backend is None:
         return []
     try:
-        return backend(query, sxng_locale)
+        return _filter_suggestions(backend(query, sxng_locale))
     except (HTTPError, SearxEngineResponseException):
         return []

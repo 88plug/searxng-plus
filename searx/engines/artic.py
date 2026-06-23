@@ -33,7 +33,7 @@ def request(query, params):
         {
             'q': query,
             'page': params['pageno'],
-            'fields': 'id,title,artist_display,medium_display,image_id,date_display,dimensions,artist_titles',
+            'fields': 'id,title,artist_display,medium_display,image_id,date_display,dimensions,artist_titles,thumbnail',
             'limit': page_size,
         }
     )
@@ -49,8 +49,15 @@ def response(resp):
     json_data = loads(resp.text)
 
     for result in json_data['data']:
+        img_src = ''
+        thumbnail = result.get('thumbnail') or {}
+        lqip = thumbnail.get('lqip')
+        if lqip:
+            img_src = lqip
+        elif result.get('image_id'):
+            img_src = image_api + '/%(image_id)s/full/843,/0/default.jpg' % result
 
-        if not result['image_id']:
+        if not img_src:
             continue
 
         results.append(
@@ -59,7 +66,7 @@ def response(resp):
                 'title': result['title'] + " (%(date_display)s) // %(artist_display)s" % result,
                 'content': "%(medium_display)s // %(dimensions)s" % result,
                 'author': ', '.join(result['artist_titles']),
-                'img_src': image_api + '/%(image_id)s/full/843,/0/default.jpg' % result,
+                'img_src': img_src,
                 'template': 'images.html',
             }
         )

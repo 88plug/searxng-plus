@@ -1,5 +1,33 @@
 .. SPDX-License-Identifier: AGPL-3.0-or-later
 
+SearXNG-Plus
+============
+
+**SearXNG-Plus** is a community-maintained distribution of SearXNG that ships
+fixes and features from open upstream issues and pull requests that were
+rejected, closed without merge, or left unmerged.
+
+- **Full documentation:** `docs/PLUS.md <docs/PLUS.md>`_
+- **Repository:** https://github.com/88plug/searxng-plus
+- **Container image:** ``ghcr.io/88plug/searxng-plus:latest``
+
+Quick start with Docker:
+
+.. code:: sh
+
+   docker run --rm -d \
+     -p 8080:8080 \
+     -v searxng-plus-config:/etc/searxng \
+     -v searxng-plus-data:/var/cache/searxng \
+     ghcr.io/88plug/searxng-plus:latest
+
+Or use the compose file in ``container/`` (image:
+``ghcr.io/88plug/searxng-plus``).  Plus-added engines are **enabled by default**
+on first run — see `docs/PLUS.md <docs/PLUS.md>`_ for release rounds and the
+defaults policy.
+
+----
+
 .. _metasearch engine: https://en.wikipedia.org/wiki/Metasearch_engine
 .. _Installation guide: https://docs.searxng.org/admin/installation.html
 .. _Configuration guide: https://docs.searxng.org/admin/settings/index.html

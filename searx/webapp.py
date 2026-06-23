@@ -527,6 +527,19 @@ def add_default_headers(response: flask.Response):
 
 
 @app.after_request
+def save_preferences_cookies(response: flask.Response):
+    """Re-save preference cookies on HTML responses so they persist across navigation."""
+    if (
+        hasattr(sxng_request, 'preferences')
+        and sxng_request.endpoint not in ('preferences',)
+        and response.content_type
+        and 'text/html' in response.content_type
+    ):
+        sxng_request.preferences.save(response)
+    return response
+
+
+@app.after_request
 def post_request(response: flask.Response):
     total_time = default_timer() - sxng_request.start_time
     timings_all = [
@@ -845,7 +858,10 @@ def autocompleter():
         mimetype = 'application/json'
     else:
         # the suggestion request comes from browser's URL bar
-        suggestions = json.dumps([sug_prefix, results])
+        relevances = {
+            'google:suggestrelevance': [600 - i for i in range(len(results))]
+        }  # chromium only shows 3 suggestions unless we attach relevances
+        suggestions = json.dumps([sug_prefix, results, [], [], relevances])
         mimetype = 'application/x-suggestions+json'
 
     suggestions = escape(suggestions, False)
@@ -1237,7 +1253,8 @@ def favicon():
 def clear_cookies():
     resp = make_response(redirect(url_for('index', _external=True)))
     for cookie_name in sxng_request.cookies:
-        resp.delete_cookie(cookie_name)
+        if cookie_name in sxng_request.preferences.key_value_settings:
+            resp.delete_cookie(cookie_name)
     return resp
 
 

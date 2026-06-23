@@ -11,6 +11,8 @@
 
 """
 
+import json
+
 from urllib.parse import urlencode
 from searx.network import raise_for_httperror
 
@@ -46,7 +48,15 @@ def request(query, params):
 def response(resp):
 
     results = []
-    json_data = resp.json()
+
+    if resp.status_code in (402, 403):
+        return results
+
+    try:
+        json_data = resp.json()
+    except json.JSONDecodeError:
+        raise_for_httperror(resp)
+        return results
 
     json_results = json_data.get('results')
     if not json_results:

@@ -178,7 +178,7 @@ class TestPreferences(SearxTestCase):
 
         cookie_callback = {}
 
-        def set_cookie_callback(name, value, max_age):  # pylint: disable=unused-argument
+        def set_cookie_callback(name, value, max_age, **kwargs):  # pylint: disable=unused-argument
             cookie_callback[name] = value
 
         response_mock = Mock(flask.Response)
@@ -198,7 +198,7 @@ class TestPreferences(SearxTestCase):
 
         cookie_callback = {}
 
-        def set_cookie_callback(name, value, max_age):  # pylint: disable=unused-argument
+        def set_cookie_callback(name, value, max_age, **kwargs):  # pylint: disable=unused-argument
             cookie_callback[name] = value
 
         response_mock = Mock(flask.Response)

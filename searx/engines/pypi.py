@@ -42,14 +42,22 @@ def request(query, params):
 def response(resp):
     results = []
     dom = html.fromstring(resp.text)
-    for entry in eval_xpath_list(dom, '/html/body/main/div/div/div/form/div/ul/li/a[@class="package-snippet"]'):
+    for entry in eval_xpath_list(dom, '//a[@class="package-snippet"]'):
         url = base_url + extract_text(eval_xpath_getindex(entry, './@href', 0))  # type: ignore
-        title = extract_text(eval_xpath_getindex(entry, './h3/span[@class="package-snippet__name"]', 0))
-        version = extract_text(eval_xpath_getindex(entry, './h3/span[@class="package-snippet__version"]', 0))
-        created_at = extract_text(
-            eval_xpath_getindex(entry, './h3/span[@class="package-snippet__created"]/time/@datetime', 0)
+        title = extract_text(eval_xpath_getindex(entry, './h3/span[@class="package-snippet__name"]', 0, default=""))
+        version = extract_text(
+            eval_xpath_getindex(entry, './h3/span[@class="package-snippet__version"]', 0, default="")
         )
-        content = extract_text(eval_xpath_getindex(entry, './p', 0))
+        created_at = extract_text(
+            eval_xpath_getindex(entry, './h3/span[@class="package-snippet__created"]', 0, default="")
+        )
+        content = extract_text(eval_xpath_getindex(entry, './p[@class="package-snippet__description"]', 0, default=""))
+        published_date = None
+        if created_at:
+            try:
+                published_date = parser.parse(created_at)
+            except (ValueError, TypeError, parser.ParserError):
+                pass
         results.append(
             {
                 "template": "packages.html",
@@ -58,7 +66,7 @@ def response(resp):
                 'package_name': title,
                 "content": content,
                 "version": version,
-                'publishedDate': parser.parse(created_at),  # type: ignore
+                'publishedDate': published_date,
             }
         )
 

@@ -22,6 +22,10 @@ SslContextKeyType = tuple[str | None, CertTypes | None, bool, bool]
 logger = logger.getChild('searx.network.client')
 LOOP: asyncio.AbstractEventLoop = None  # pyright: ignore[reportAssignmentType]
 
+# SSL contexts are cached and reused per (proxy, cert, verify, trust_env) key to
+# reduce memory usage (~500 KiB per context).  shuffle_ciphers() is applied on
+# every get_sslcontexts() call so each request gets a randomized cipher order
+# while the underlying context object is shared (see issue #2977).
 SSLCONTEXTS: dict[SslContextKeyType, SSLContext] = {}
 
 
@@ -54,6 +58,7 @@ def get_sslcontexts(
     key: SslContextKeyType = (proxy_url, cert, verify, trust_env)
     if key not in SSLCONTEXTS:
         SSLCONTEXTS[key] = httpx.create_ssl_context(verify, cert, trust_env)
+    # Re-shuffle ciphers on the cached context for each request (TLS fingerprint bypass).
     shuffle_ciphers(SSLCONTEXTS[key])
     return SSLCONTEXTS[key]
 

@@ -72,6 +72,9 @@ class SettingsBrand(msgspec.Struct, kw_only=True, forbid_unknown_fields=True):
     # long as we don't have a more general solution, we should support it in the
     # given function, but it should not be expanded further.
 
+    display_instance_name: bool = False
+    """Show the instance name in the simple theme header."""
+
     new_issue_url: str = "https://github.com/searxng/searxng/issues/new"
     """If you host your own issue tracker not on GitHub, then unset this URL.
 

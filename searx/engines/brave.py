@@ -129,7 +129,9 @@ from lxml import html
 
 from searx import locales
 from searx.enginelib.traits import EngineTraits
+from searx.exceptions import SearxEngineTooManyRequestsException
 from searx.extended_types import SXNG_Response
+from searx.network import raise_for_httperror
 from searx.result_types import EngineResults
 from searx.utils import (
     eval_xpath_getindex,
@@ -262,6 +264,11 @@ def extract_json_data(text: str) -> dict[str, t.Any]:
 
 
 def response(resp: SXNG_Response) -> EngineResults:
+
+    if resp.status_code == 429:
+        raise SearxEngineTooManyRequestsException()
+
+    raise_for_httperror(resp)
 
     if brave_category in ("search", "goggles"):
         return _parse_search(resp)

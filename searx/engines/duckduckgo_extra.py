@@ -126,6 +126,10 @@ def request(query: str, params: "OnlineParams") -> None:
         "a": "h_",
     }
 
+    if ddg_category == "news":
+        # News tab uses a dedicated vqd token (iar=news); see issue #6257
+        args["iar"] = "news"
+
     params["cookies"]["ad"] = eng_lang  # zh_CN
     params["cookies"]["ah"] = eng_region  # "us-en,de-de"
     params["cookies"]["l"] = eng_region  # "hk-tzh"
@@ -186,6 +190,14 @@ def _news_result(result):
     }
 
 
+def _is_news_result(result: dict[str, t.Any]) -> bool:
+    result_type = result.get("type", "news")
+    if result_type in ("web", "website", "search"):
+        return False
+    # General web results lack news-specific fields
+    return "date" in result or "excerpt" in result
+
+
 def response(resp):
     results = []
     res_json = resp.json()
@@ -196,6 +208,8 @@ def response(resp):
         elif ddg_category == 'videos':
             results.append(_video_result(result))
         elif ddg_category == 'news':
+            if not _is_news_result(result):
+                continue
             results.append(_news_result(result))
         else:
             raise ValueError(f"Invalid duckduckgo category: {ddg_category}")
