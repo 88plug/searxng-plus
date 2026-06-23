@@ -94,7 +94,7 @@ jobs:
         run: make V=1 install
 
       - name: Freeze version metadata
-        run: python -m searx.version freeze
+        run: ./local/py3/bin/python -m searx.version freeze
 
       - name: Build and push
         env:
@@ -103,7 +103,7 @@ jobs:
           GITHUB_REPOSITORY_OWNER: "88plug"
         run: |
           set -euo pipefail
-          eval "$(python -m searx.version)"
+          eval "$(./local/py3/bin/python -m searx.version)"
           SHORT_SHA="${GITHUB_SHA::7}"
 
           docker buildx build --platform linux/amd64 --load \
