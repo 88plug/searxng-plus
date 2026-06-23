@@ -115,7 +115,8 @@ jobs:
             --file="./container/builder.dockerfile" \
             .
 
-          docker buildx build --load \
+          # dist stage reads builder from local docker daemon (not buildx registry)
+          docker build \
             --build-arg="CONTAINER_IMAGE_ORGANIZATION=88plug" \
             --build-arg="CONTAINER_IMAGE_NAME=searxng-plus" \
             --build-arg="CREATED=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
