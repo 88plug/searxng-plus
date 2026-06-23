@@ -178,6 +178,67 @@ Commit *searxng-plus: 20 bugs + 20 features (round 3)* — ports open upstream P
 
 ---
 
+### Round 4 — Bot bypass: curl_cffi impersonate + Tor profile
+
+*Network-layer evaluation and opt-in bot-bypass tooling (upstream PR [#5476](https://github.com/searxng/searxng/pull/5476) POC port).*
+
+#### Real evaluation (2026-06-22, egress from builder container)
+
+Probed five bot-sensitive engines with five transport modes. **Usable** = HTTP 200 + parseable results + no CAPTCHA/challenge markers.
+
+| Engine | httpx + cipher shuffle | curl_cffi chrome | curl_cffi firefox | Tor + httpx | Tor + chrome |
+|--------|------------------------|------------------|-------------------|-------------|--------------|
+| Mojeek | yes | yes | yes | timeout | 403 |
+| DuckDuckGo HTML | yes | **challenge** | **challenge** | yes | 403 |
+| Startpage | no* | no* | no* | no* | no* |
+| Brave | 429 CAPTCHA | curl error | curl error | timeout | timeout |
+| Qwant | no* | no* | no* | no* | no* |
+
+\*Startpage/Qwant simple probes did not match engine HTML flow; transport alone does not fix token/session engines.
+
+**Conclusions:**
+
+1. **curl_cffi impersonate** helps engines that fingerprint TLS/HTTP stacks (Mojeek POC). It is **not** a global default — DuckDuckGo HTML POST gets `202` + `anomaly-modal` with chrome/firefox impersonation while plain httpx works from the same IP.
+2. **Tor outgoing proxy** rotates egress but adds 3–10s latency, times out or 403s many commercial engines, and is useless for operator privacy theater (engines still see *a* IP, just a Tor exit).
+3. **Cipher shuffle** (issue [#2977](https://github.com/searxng/searxng/issues/2977)) remains the default httpx mitigation; impersonate is per-engine opt-in.
+
+#### What shipped
+
+| Item | Default | Notes |
+|------|---------|-------|
+| `httpx_curl_cffi==0.1.5` dependency | installed | Browser TLS+HTTP fingerprint via [curl_cffi](https://github.com/lexiforest/curl_cffi) |
+| `network.impersonate` setting | **off** | Per-engine: `chrome`, `firefox`, `safari`, `edge` |
+| Mojeek impersonate | opt-in | `network.impersonate: chrome` in settings (engine still `disabled: true` upstream) |
+| Tor compose profile | **off** | `docker compose --profile tor up -d` + `container/settings.tor.example.yml` |
+| FlareSolverr | not added | Sidecar without network client is useless; CAPTCHA bugs are mostly non-Cloudflare |
+
+#### Enable curl_cffi impersonate (per engine)
+
+```yaml
+engines:
+  - name: mojeek
+    disabled: false
+    network:
+      impersonate: chrome
+```
+
+Child engines can reference a parent network: `network: mojeek`.
+
+**Do not** enable impersonate on DuckDuckGo — live eval showed it triggers DDG's anomaly modal.
+
+#### Enable Tor outgoing proxy
+
+```sh
+cd container
+docker compose --profile tor up -d
+```
+
+Merge `container/settings.tor.example.yml` into `/etc/searxng/settings.yml` (or uncomment the `outgoing.proxies` block in `searx/settings.yml`). Requires `using_tor_proxy: true` and `extra_proxy_timeout: 10` (seconds).
+
+Onion-category engines (Ahmia, etc.) require Tor; the `ahmia_filter` plugin enforces this.
+
+---
+
 ## Defaults enabled policy
 
 SearXNG-Plus follows a simple rule:

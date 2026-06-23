@@ -1,0 +1,12 @@
+# Merge into /etc/searxng/settings.yml when using the Tor compose profile.
+# Start with: docker compose --profile tor up -d
+#
+# See docs/PLUS.md "Bot bypass and outgoing proxies".
+
+use_default_settings: true
+
+outgoing:
+  proxies:
+    all://: socks5h://tor:9050
+  using_tor_proxy: true
+  extra_proxy_timeout: 10

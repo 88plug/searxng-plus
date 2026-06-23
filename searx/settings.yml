@@ -206,13 +206,19 @@ outgoing:
   #  proxies:
   #    all://:
   #      - http://proxy1:8080
-  #      - http://proxy2:8080
+  #      - socks5h://tor:9050   # with container/docker-compose.yml --profile tor
   #
   #  using_tor_proxy: true
   #
   # Extra seconds to add in order to account for the time taken by the proxy
   #
   #  extra_proxy_timeout: 10
+  #
+  # Per-engine TLS/HTTP fingerprint impersonation (curl_cffi, opt-in):
+  #   engines:
+  #     - name: mojeek
+  #       network:
+  #         impersonate: chrome   # chrome | firefox | safari | edge
   #
   # uncomment below section only if you have more than one network interface
   # which can be the source of outgoing search requests
@@ -2858,12 +2864,15 @@ engines:
 
   - name: mojeek
     shortcut: mjk
+    network:
+      impersonate: chrome
     engine: mojeek
     categories: [general, web]
     disabled: true
 
   - name: mojeek images
     shortcut: mjkimg
+    network: mojeek
     engine: mojeek
     categories: [images, web]
     search_type: images
@@ -2872,6 +2881,7 @@ engines:
 
   - name: mojeek news
     shortcut: mjknews
+    network: mojeek
     engine: mojeek
     categories: [news, web]
     search_type: news

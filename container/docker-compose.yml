@@ -14,6 +14,26 @@ services:
     volumes:
       - ./core-config/:/etc/searxng/:Z
       - core-data:/var/cache/searxng/
+    depends_on:
+      valkey:
+        condition: service_started
+
+  # Optional Tor sidecar (opt-in profile). Enable in settings.yml:
+  #   outgoing.proxies.all://: socks5h://tor:9050
+  #   outgoing.using_tor_proxy: true
+  #   outgoing.extra_proxy_timeout: 10
+  # Then: docker compose --profile tor up -d
+  tor:
+    container_name: searxng-tor
+    image: docker.io/dperson/torproxy:latest
+    profiles: [tor]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O- https://check.torproject.org/api/ip || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   valkey:
     container_name: searxng-valkey

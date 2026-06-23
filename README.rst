@@ -23,7 +23,8 @@ Quick start with Docker:
 
 Or use the compose file in ``container/`` (image:
 ``ghcr.io/88plug/searxng-plus``).  Plus-added engines are **enabled by default**
-on first run — see `docs/PLUS.md <docs/PLUS.md>`_ for release rounds and the
+on first run — see `docs/PLUS.md <docs/PLUS.md>`_ for release rounds (including
+Round 4: curl_cffi impersonate + optional Tor profile) and the
 defaults policy.
 
 ----

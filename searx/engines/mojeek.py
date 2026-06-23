@@ -75,6 +75,10 @@ def request(query, params):
         logger.debug(args["since"])
 
     params["url"] = f"{base_url}/search?{urlencode(args)}"
+
+    if search_type == "images":
+        params["headers"]["Accept"] = "*/*"
+
     params["cookies"] = {
         language_param: traits.get_language(params["searxng_locale"], traits.custom["language_all"]),
         region_param: traits.get_region(params["searxng_locale"], traits.custom["region_all"]),

@@ -105,6 +105,19 @@ class TestNetwork(SearxTestCase):
 
         await network.aclose()
 
+    async def test_get_client_impersonate(self):
+        network = Network(verify=True, impersonate='chrome')
+        client1 = await network.get_client()
+        client2 = await network.get_client()
+        network_plain = Network(verify=True)
+        client3 = await network_plain.get_client()
+
+        self.assertEqual(client1, client2)
+        self.assertNotEqual(client1, client3)
+
+        await network.aclose()
+        await network_plain.aclose()
+
     async def test_aclose(self):
         network = Network(verify=True)
         await network.get_client()
