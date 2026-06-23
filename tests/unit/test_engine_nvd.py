@@ -29,7 +29,7 @@ class NvdTests(SearxTestCase):
             ("1999-03-22T05:00:00", datetime(1999, 3, 22, 5, 0, 0)),
         ]
     )
-    def test_published_date_parses_isoformat_variants(self, published, expected):
+    def test_isoformat_variants(self, published, expected):
         response = Mock()
         response.json.return_value = {
             "response": [

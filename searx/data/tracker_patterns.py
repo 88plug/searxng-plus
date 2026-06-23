@@ -132,7 +132,7 @@ class TrackerPatternsDB:
         new_url = url
         parsed_new_url = urlparse(url=new_url)
 
-        for rule in self.rules():
+        for rule in self.rules():  # pylint: disable=too-many-nested-blocks
 
             query_str: str = parsed_new_url.query
             if not query_str:
