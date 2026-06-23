@@ -32,13 +32,9 @@ def request(query, params):
     params["headers"]["Content-Type"] = "application/json"
 
     if cf_ai_gateway:
-        params["url"] = (
-            f"https://gateway.ai.cloudflare.com/v1/{cf_account_id}/{cf_ai_gateway}/workers-ai/{cf_ai_model}"
-        )
+        params["url"] = f"https://gateway.ai.cloudflare.com/v1/{cf_account_id}/{cf_ai_gateway}/workers-ai/{cf_ai_model}"
     else:
-        params["url"] = (
-            f"https://api.cloudflare.com/client/v4/accounts/{cf_account_id}/ai/run/{cf_ai_model}"
-        )
+        params["url"] = f"https://api.cloudflare.com/client/v4/accounts/{cf_account_id}/ai/run/{cf_ai_model}"
 
     params["json"] = {
         "messages": [

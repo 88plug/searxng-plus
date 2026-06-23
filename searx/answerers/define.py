@@ -40,9 +40,7 @@ class SXNGAnswerer(Answerer):
         if not word or not _WORD_RE.match(word):
             return []
 
-        url = "https://api.duckduckgo.com/?" + urlencode(
-            {"q": f"define {word}", "format": "json", "no_redirect": 1}
-        )
+        url = "https://api.duckduckgo.com/?" + urlencode({"q": f"define {word}", "format": "json", "no_redirect": 1})
         try:
             resp = get(url, timeout=3.0)
             data = resp.json()

@@ -82,9 +82,7 @@ def _fetch_scripts() -> list[dict[str, t.Any]]:
         try:
             resp = get(url, timeout=30)
             if resp.status_code != 200:
-                _logger.warning(
-                    "Unexpected PocketBase API status: %s", resp.status_code
-                )
+                _logger.warning("Unexpected PocketBase API status: %s", resp.status_code)
                 return []
             data = resp.json()
         except (ValueError, HTTPError, TimeoutException) as exc:
@@ -119,9 +117,7 @@ def _fetch_scripts() -> list[dict[str, t.Any]]:
 
             description = item.get("description")
             description = description[:500] if isinstance(description, str) else ""
-            scripts.append(
-                {"name": name.strip(), "slug": slug, "description": description}
-            )
+            scripts.append({"name": name.strip(), "slug": slug, "description": description})
 
         total_pages = data.get("totalPages", 1)
         if page_num >= total_pages:
@@ -221,9 +217,7 @@ def _score_script(script: dict[str, t.Any], words: list[str]) -> int:
     return score
 
 
-def search(
-    query: str, params: "RequestParams"
-) -> EngineResults:  # pylint: disable=unused-argument
+def search(query: str, params: "RequestParams") -> EngineResults:  # pylint: disable=unused-argument
     res = EngineResults()
     if not query or not query.strip():
         return res
@@ -252,11 +246,7 @@ def search(
         return res
 
     words = query.lower().split()
-    scored = [
-        (score, script)
-        for script in scripts
-        if (score := _score_script(script, words)) > 0
-    ]
+    scored = [(score, script) for script in scripts if (score := _score_script(script, words)) > 0]
     scored.sort(key=lambda item: item[0], reverse=True)
 
     for _score, script in scored[:_MAX_RESULTS]:
