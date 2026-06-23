@@ -17,7 +17,7 @@ class NvdTests(SearxTestCase):
 
     def setUp(self):
         super().setUp()
-        self.nvd = searx.engines.engines['nvd']
+        self.nvd = searx.engines.engines["nvd"]
         self.nvd.logger.setLevel(logging.INFO)
 
     def tearDown(self):

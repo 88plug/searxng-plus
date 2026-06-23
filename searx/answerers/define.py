@@ -12,7 +12,7 @@ from searx.result_types.answer import BaseAnswer
 
 from . import Answerer, AnswererInfo
 
-_WORD_RE = re.compile(r'^[a-zA-Z][a-zA-Z\-\'\.]{0,48}$')
+_WORD_RE = re.compile(r"^[a-zA-Z][a-zA-Z\-\'\.]{0,48}$")
 
 
 class SXNGAnswerer(Answerer):
@@ -62,4 +62,10 @@ class SXNGAnswerer(Answerer):
 
         source = data.get("AbstractSource") or "DuckDuckGo"
         heading = data.get("Heading") or word
-        return [Answer(answer=f"{heading}: {definition}", url=data.get("AbstractURL") or "", infobox=source)]
+        return [
+            Answer(
+                answer=f"{heading}: {definition}",
+                url=data.get("AbstractURL") or "",
+                infobox=source,
+            )
+        ]

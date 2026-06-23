@@ -9,9 +9,9 @@ from tests import SearxTestCase
 class TestRequireAllTerms(SearxTestCase):
 
     def test_bang_quotes_all_terms(self):
-        q = RawTextQuery('!+ linux kernel security', [])
+        q = RawTextQuery("!+ linux kernel security", [])
         self.assertEqual(q.getQuery(), '"linux" "kernel" "security"')
 
     def test_without_bang_unchanged(self):
-        q = RawTextQuery('linux kernel security', [])
-        self.assertEqual(q.getQuery(), 'linux kernel security')
+        q = RawTextQuery("linux kernel security", [])
+        self.assertEqual(q.getQuery(), "linux kernel security")
