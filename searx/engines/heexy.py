@@ -64,7 +64,7 @@ def response(resp: "SXNG_Response"):
     res = EngineResults()
 
     json_resp = resp.json()
-    if not json_resp["success"]:
+    if not json_resp.get("success"):
         raise SearxEngineAccessDeniedException()
 
     result: dict[str, str]

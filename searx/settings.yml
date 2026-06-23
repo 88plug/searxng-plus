@@ -1311,14 +1311,14 @@ engines:
     categories: general
     heexy_categ: web
     shortcut: he
-    disabled: false
+    inactive: true  # seapi.heexy.org: Cloudflare blocks server egress (403)
 
   - name: heexy images
     engine: heexy
     categories: images
     heexy_categ: image
     shortcut: hei
-    disabled: false
+    inactive: true
 
   - name: hex
     engine: hex
@@ -1613,28 +1613,30 @@ engines:
     categories: general
     luxxle_categ: search
     shortcut: lux
-    disabled: false
+    network:
+      impersonate: firefox
+      enable_http2: false
 
   - name: luxxle images
     engine: luxxle
     categories: images
     luxxle_categ: images
     shortcut: luxi
-    disabled: false
+    network: luxxle
 
   - name: luxxle videos
     engine: luxxle
     categories: videos
     luxxle_categ: videos
     shortcut: luxv
-    disabled: false
+    network: luxxle
 
   - name: luxxle news
     engine: luxxle
     categories: news
     luxxle_categ: news
     shortcut: luxn
-    disabled: false
+    network: luxxle
 
   - name: magnific
     engine: magnific
@@ -3428,7 +3430,7 @@ engines:
     engine: s1search
     shortcut: ifs
     base_url: https://search.infospace.com
-    disabled: false
+    inactive: true  # DNS blackholed (0.0.0.0) — domain dead
 
 # Doku engine lets you access to any Doku wiki instance:
 # A public one or a privete/corporate one.

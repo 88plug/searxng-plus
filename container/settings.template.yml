@@ -19,12 +19,15 @@ brand:
   display_instance_name: true
 
 # Plus-added and plus-tuned engines: enabled on first run.
+# Broken upstream mirrors (heexy/infospace) are inactive in searx/settings.yml.
 engines:
   - name: mojeek
     disabled: false
   - name: mojeek images
     disabled: false
   - name: mojeek news
+    disabled: false
+  - name: luxxle
     disabled: false
   - name: neocities
     disabled: false
@@ -56,15 +59,9 @@ engines:
     disabled: false
   - name: chatnoir
     disabled: false
-  - name: heexy
-    disabled: false
-  - name: heexy images
-    disabled: false
   - name: seekninja
     disabled: false
   - name: findfiles
-    disabled: false
-  - name: luxxle
     disabled: false
   - name: searchzee
     disabled: false
@@ -72,7 +69,7 @@ engines:
     disabled: false
   - name: vuhuv
     disabled: false
-  - name: s1search
+  - name: searchtoday
     disabled: false
   - name: resulthunter
     disabled: false

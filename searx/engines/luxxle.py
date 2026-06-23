@@ -11,6 +11,7 @@ from urllib.parse import quote_plus, unquote_plus
 import typing as t
 from lxml import html
 
+from searx.exceptions import SearxEngineAccessDeniedException
 from searx.result_types import EngineResults
 from searx.network import get
 from searx.utils import (
@@ -76,8 +77,12 @@ def _obtain_telemetry_data(query: str) -> dict[str, str]:
     This data is only valid for very short times
     """
     resp = get(
-        f"{base_url}/lux{luxxle_categ}?q={quote_plus(query)}", headers={"User-Agent": gen_useragent(), "Sec-GPC": "1"}
+        f"{base_url}/lux{luxxle_categ}?q={quote_plus(query)}",
+        headers={"User-Agent": gen_useragent(), "Sec-GPC": "1", "Referer": f"{base_url}/"},
+        raise_for_httperror=False,
     )
+    if resp.status_code in (401, 403) or not extr(resp.text, "authorization"):
+        raise SearxEngineAccessDeniedException()
 
     def extr_js_variable(name: str) -> str:
         val = extr(resp.text, f"var {name} = \"", "\";")
